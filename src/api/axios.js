@@ -1,7 +1,7 @@
 // frontend/src/api/axios.js
 import axios from 'axios';
 const instance = axios.create({
-baseURL: 'https://thefolio-backend-u3mx.onrender.com/api',
+baseURL: import.meta.env.VITE_API_URL || 'https://thefolio-backend-u3mx.onrender.com/api',
 });
 // This interceptor runs before EVERY request.
 // It reads the token from localStorage and adds it to the Authorization header.
