@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import API from '../api/axios';
 
 export default function RegisterPage() {
     const { setUser } = useAuth();
@@ -57,7 +57,7 @@ export default function RegisterPage() {
 
     // 4. SUBMISSION LOGIC (MERN Integrated)
     const handleSubmit = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
         if (formData.interest === "Hardcore" && level < 13) {
             setModalConfig({
@@ -69,38 +69,51 @@ export default function RegisterPage() {
             return;
         }
 
-        try {
-            // Send to your backend
-            const response = await axios.post('http://localhost:5000/api/auth/register', {
-                name: formData.fullname,
-                username: formData.username,
-                email: formData.email,
-                password: formData.password
-            });
+        const formattedDob = new Date(formData.dob).toISOString().split('T')[0];
 
-            // Save Token & Update Global User State (Hides Register in Navbar)
-            localStorage.setItem('token', response.data.token);
-            setUser(response.data.user);
+    try {            
+    const response = await API.post('/auth/register', {
+        name: formData.fullname,
+        email: formData.email,
+        password: formData.password,
+        gamer_tag: formData.username,
+        dob: formData.dob,
+        interest_level: formData.interest,
+        role: 'member', 
+        status: 'active'
+    });
 
-            setModalConfig({
-                title: "QUEST COMPLETE!",
-                message: `Welcome to the Guild, ${formData.username.toUpperCase()}!`,
-                isError: false
-            });
-            setShowModal(true);
+        localStorage.setItem('token', response.data.token);
+        
+        if (response.data && typeof setUser === 'function') {
+        setUser({
+            id: response.data.user?.id || response.data.id,
+            name: response.data.user?.name || response.data.name,
+            email: response.data.user?.email || response.data.email
+        });
+    } else {
+        console.warn("User saved, but setUser is missing from context.");
+    }
 
-            // Redirect after success
-            setTimeout(() => navigate('/home'), 1500);
+        setModalConfig({
+        title: "QUEST COMPLETE!",
+        message: `Welcome to the Guild, ${formData.username.toUpperCase()}!`,
+        isError: false
+    });
+    setShowModal(true);
+    setTimeout(() => navigate('/home'), 1500);
 
-        } catch (err) {
-            setModalConfig({
-                title: "QUEST FAILED!",
-                message: err.response?.data?.message || "Internal Server Error",
-                isError: true
-            });
-            setShowModal(true);
-        }
-    };
+   } catch (err) {
+        // Log the actual error object to the browser console
+        console.dir(err); 
+        setModalConfig({
+            title: "QUEST FAILED!",
+            message: err.response?.data?.message || "Check Database Constraints",
+            isError: true
+        });
+        setShowModal(true);
+    }
+};
 
     return (
         <main className="comic-page">

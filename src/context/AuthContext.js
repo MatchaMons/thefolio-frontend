@@ -1,52 +1,55 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // Added missing loading state
 
-  // Check for existing token on load
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // You could call /api/auth/me here to verify the token
-      setUser(JSON.parse(localStorage.getItem('user')));
-    }
-    setLoading(false);
-  }, []);
+    // 1. Check for existing token on load
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const savedUser = localStorage.getItem('user');
+        
+        if (token && savedUser) {
+            try {
+                setUser(JSON.parse(savedUser));
+            } catch (e) {
+                console.error("Failed to parse user from storage");
+                localStorage.removeItem('user');
+            }
+        }
+        setLoading(false);
+    }, []);
 
-  const login = async (email, password) => {
+    // 2. Login Logic
+    const login = async (email, password) => {
     try {
-      // 🟢 CRITICAL: The keys here MUST be "email" and "password"
-      const res = await axios.post('http://localhost:5000/api/auth/login', { 
-        email: email.toLowerCase().trim(), 
-        password: password 
-      });
+        const res = await API.post('/auth/login', { email, password });
+        localStorage.setItem('token', res.data.token);
+        
+        // Handle nested or flat structure
+        const userData = res.data.user || res.data; 
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+        return userData;
+    } catch (err) { throw err; }
+};
 
-      // Save to state and storage
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data));
-      setUser(res.data);
-      
-      return res.data;
-    } catch (err) {
-      throw err;
-    }
-  };
+    // 3. Logout Logic
+    const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+    };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+    // 4. THE SINGLE RETURN (Includes everything in the value)
+    return (
+        <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
+            {!loading && children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = () => useContext(AuthContext);

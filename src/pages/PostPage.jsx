@@ -18,7 +18,8 @@ const PostPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [modalConfig, setModalConfig] = useState({ title: '', message: '', isError: false });
 
-    const BACKEND_URL = "http://localhost:5000";
+    const BACKEND_URL = "https://thefolio-backend-u3mx.onrender.com";
+    const IMAGE_BASE_URL = BACKEND_URL.replace('/api', '');
 
     useEffect(() => {
         const fetchFullIntel = async () => {
@@ -27,26 +28,39 @@ const PostPage = () => {
                 setPost(data);
                 setReactionCount(parseInt(data.reaction_count) || 0);
                 setUserReaction(data.user_reaction || null);
+            } catch (err) {
+                console.error("POST FETCH ERROR:", err);
+                // Optional: navigate('/feed') if post is missing
+            }
 
+            try {
                 const commentRes = await API.get(`/comments/${id}`);
                 setComments(commentRes.data);
             } catch (err) {
-                console.error("FAILED TO DECRYPT INTEL:", err);
+                console.warn("COMMENT FETCH ERROR:", err);
             }
         };
-        fetchFullIntel();
+        if (id) fetchFullIntel();
     }, [id]);
 
-    const handleDeletePost = async () => {
-        if (!window.confirm("ARE YOU SURE YOU WANT TO SCRUB THIS INTEL?")) return;
+    const handleReaction = async () => {
+        if (!user) return navigate('/login');
         try {
-            await API.delete(`/posts/${id}`);
-            setModalConfig({ title: 'BAM!', message: 'MISSION SCRUBBED: INTEL REMOVED.', isError: false });
-            setShowModal(true);
+            const { data } = await API.post(`/posts/${id}/react`);
+            setReactionCount(data.reactionCount);
+            setUserReaction(data.userReaction);
         } catch (err) {
-            setModalConfig({ title: 'OOF!', message: 'SCRUB FAILED.', isError: true });
-            setShowModal(true);
+            console.error("REACTION FAILED:", err);
         }
+    };
+
+    const handleDeletePost = () => {
+        setModalConfig({ 
+            title: 'CAUTION!', 
+            message: 'ARE YOU SURE YOU WANT TO SCRUB THIS INTEL? THIS ACTION IS PERMANENT.', 
+            isError: true 
+        });
+        setShowModal(true);
     };
 
     const handleCommentSubmit = async (e) => {
@@ -61,17 +75,38 @@ const PostPage = () => {
         }
     };
 
-    const handleModalClose = () => {
-        setShowModal(false);
-        if (!modalConfig.isError) navigate('/feed'); 
+    const confirmDelete = async () => {
+        try {
+            await API.delete(`/posts/${id}`);
+            setModalConfig({ title: 'BAM!', message: 'MISSION SCRUBBED: INTEL REMOVED.', isError: false });
+        } catch (err) {
+            setModalConfig({ title: 'OOF!', message: 'SCRUB FAILED.', isError: true });
+        }
     };
 
-    if (!post) return <div className="comic-page"><h2>LOADING INTEL...</h2></div>;
+    const handleModalClose = () => {
+        setShowModal(false);
+        if (modalConfig.title === 'BAM!') {
+            navigate('/feed');
+        }
+    };
+
+    // 🛡️ --- LOADING SHIELD ---
+    // This prevents the "Cannot read properties of null" error
+    if (!post) {
+        return (
+            <main className="comic-page post-detail-container">
+                <section className="content panel panel-full" style={{ textAlign: 'center', padding: '50px' }}>
+                    <h1 className="banger-text">DECRYPTING INTEL...</h1>
+                    <p className="system-text">ESTABLISHING SECURE CONNECTION TO DATABASE</p>
+                </section>
+            </main>
+        );
+    }
 
     return (
         <main className="comic-page post-detail-container">
             <section className="content panel panel-full post-content-panel">
-                {/* --- HEADER --- */}
                 <div className="post-header">
                     <Link to="/feed" className="back-link">← BACK TO GUILD BOARD</Link>
                     <h1 className="banger-text post-title-extra-large">{post.title?.toUpperCase()}</h1>
@@ -80,23 +115,24 @@ const PostPage = () => {
                     </p>
                 </div>
 
-                {/* --- MAIN IMAGE --- */}
                 {post.image && (
                     <div className="post-image-frame post-image-wrapper">
                         <img 
-                            src={`${BACKEND_URL}${post.image}`} 
+                            src={`${IMAGE_BASE_URL}${post.image}`} 
                             alt="Intel" 
                             className="post-image-large" 
+                            onError={(e) => { 
+                                e.target.onerror = null; 
+                                e.target.src = "https://placehold.co/600x400?text=INTEL+NOT+FOUND"; 
+                            }}
                         />
                     </div>
                 )}
 
-                {/* --- BODY CONTENT --- */}
                 <div className="post-content-body post-body-text">
-                    <p>{post.body || post.content}</p>
+                    <p>{post.body || post.content || "NO INTEL PROVIDED"}</p>
                 </div>
 
-                {/* --- OWNER ACTIONS --- */}
                 {(user?.id === post.author_id || user?.role === 'admin') && (
                     <div className="post-actions" style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                         {user.id === post.author_id && (
@@ -106,16 +142,17 @@ const PostPage = () => {
                     </div>
                 )}
 
-                {/* --- REACTIONS --- */}
                 <div className="reaction-bar">
-                   <button className="critical-hit-btn">
-                     👍 {reactionCount} OPERATORS REACTED
-                   </button>
+                    <button 
+                        onClick={handleReaction} 
+                        className={`critical-hit-btn ${userReaction ? 'active' : ''}`}
+                    >
+                        {userReaction ? '❤️' : '👍'} {reactionCount} OPERATORS REACTED
+                    </button>
                 </div>
 
                 <hr className="comic-divider" />
 
-                {/* --- COMMENT SECTION --- */}
                 <div className="comment-section-area">
                     <h3 className="panel-sub-title">INTEL FEEDBACK (COMMENTS)</h3>
                     
@@ -145,17 +182,25 @@ const PostPage = () => {
                 </div>
             </section>
 
-            {/* --- MODAL --- */}
             {showModal && (
                 <div className="modal-overlay" style={{ display: 'flex' }}>
                     <div className="comic-popup">
-                        <div className="popup-header"><span className="system-text">QUEST LOG:</span></div>
+                        <div className="popup-header">
+                            <span className="system-text">QUEST LOG:</span>
+                        </div>
                         <div className="popup-content">
                             <div className="quest-bam" style={{ color: modalConfig.isError ? "#ff4d4d" : "var(--yellow)" }}>
                                 {modalConfig.title}
                             </div>
                             <p>{modalConfig.message}</p>
-                            <button onClick={handleModalClose} className="comic-button-label">OK</button>
+                            {modalConfig.title === 'CAUTION!' ? (
+                                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                                    <button onClick={confirmDelete} className="comic-button-label" style={{ backgroundColor: '#ff4d4d' }}>CONFIRM</button>
+                                    <button onClick={() => setShowModal(false)} className="comic-button-label">ABORT</button>
+                                </div>
+                            ) : (
+                                <button onClick={handleModalClose} className="comic-button-label">OK</button>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import API from '../api/axios';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://thefolio-backend-u3mx.onrender.com';
 
 const ProfilePage = () => {
   const { user, setUser, logout } = useAuth();
@@ -39,19 +39,16 @@ const ProfilePage = () => {
   const handleProfile = async (e) => {
     e.preventDefault();
     setMsg('UPLOADING DATA...');
-    const token = localStorage.getItem('token');
     const fd = new FormData();
     fd.append('name', name);
     fd.append('bio', bio);
     if (pic) fd.append('profilePic', pic);
 
     try {
-      const { data } = await axios.put(`${BACKEND_URL}/api/auth/profile`, fd, {
-        headers: { 
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}` 
-        }
+      const { data } = await API.put('/auth/profile', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
+      
       if (setUser) setUser(data);
       localStorage.setItem('user', JSON.stringify(data));
       setMsg('SUCCESS: PLAYER DATA UPDATED!');
@@ -59,17 +56,16 @@ const ProfilePage = () => {
     } catch (err) {
       setMsg(err.response?.data?.message || 'CRITICAL ERROR: UPDATE FAILED');
     }
-  };
+};
 
-  const handlePassword = async (e) => {
+ const handlePassword = async (e) => {
     e.preventDefault();
     setMsg('INITIATING SECURITY UPGRADE...');
-    const token = localStorage.getItem('token');
     
     try {
-      const { data } = await axios.put(`${BACKEND_URL}/api/auth/change-password`, 
-        { currentPassword: curPw, newPassword: newPw },
-        { headers: { 'Authorization': `Bearer ${token}` }}
+      // ✅ Simplified to use your API tool
+      const { data } = await API.put('/auth/change-password', 
+        { currentPassword: curPw, newPassword: newPw }
       );
       setMsg(data.message);
       setCurPw(''); 
@@ -77,9 +73,9 @@ const ProfilePage = () => {
     } catch (err) {
       setMsg(err.response?.data?.message || 'ERROR: WRONG CURRENT PASSWORD');
     }
-  };
+};
 
-  const picSrc = user?.profilePic 
+    const picSrc = user?.profilePic 
     ? `${BACKEND_URL}/uploads/${user.profilePic}` 
     : '/default-avatar.png';
 

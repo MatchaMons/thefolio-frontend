@@ -10,21 +10,26 @@ const FeedPage = () => {
     const navigate = useNavigate();
 
     // The backend address where your images are hosted
-    const BACKEND_URL = "http://localhost:5000";
+    const BACKEND_URL = "https://thefolio-backend-u3mx.onrender.com";
 
     useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                // Fetching the joined data from your updated PostgreSQL route
-                const { data } = await API.get('/posts');
-                setPosts(data);
-                setLoading(false);
-            } catch (err) {
-                console.error("FAILED TO RETRIEVE INTEL:", err);
-                setLoading(false);
-            }
-        };
-        fetchPosts();
+    const fetchPosts = async () => {
+        // Set a safety timeout of 5 seconds
+        const timer = setTimeout(() => {
+            if (loading) setLoading(false);
+        }, 3000);
+
+        try {
+            const { data } = await API.get('/posts');
+            setPosts(data);
+        } catch (err) {
+            console.error("FAILED TO RETRIEVE INTEL:", err);
+        } finally {
+            setLoading(false);
+            clearTimeout(timer);
+        }
+    };
+    fetchPosts();
     }, []);
 
     if (loading) {
@@ -58,7 +63,7 @@ const FeedPage = () => {
                                 {post.image ? (
                                     <div className="panel-img-container">
                                         {/* 🟢 FIX: Correctly mapping the backend URL to the stored path */}
-                                        <img src={`${BACKEND_URL}${post.image}`} alt="Mission Intel" />
+                                        <img src={`${BACKEND_URL}/uploads/${post.image}`} alt="Mission Intel" />
                                     </div>
                                 ) : (
                                     <div className="panel-placeholder">NO VISUAL ATTACHED</div>
