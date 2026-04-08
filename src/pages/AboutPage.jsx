@@ -30,7 +30,6 @@ export default function AboutPage() {
 
         window.addEventListener('keydown', handleKeyDown);
         
-        // Logs the secret hint to the console just like your HTML script
         console.log("%c [SECRET] %c Type %cstartBattle()%c to bypass the firewall.", 
             "color: #ff00ff; font-weight: bold;", "color: white;", 
             "color: lime; font-family: monospace;", "color: white;");
@@ -67,7 +66,8 @@ export default function AboutPage() {
 
                 <section className="content panel panel-third" style={{ flex: '1', margin: 0 }}>
                     <img 
-                        src={loveGamingImg} 
+                        /* ✅ FIX: Reference directly from public folder */
+                        src="/LoveGaming.jpg" 
                         alt="Student coding on a laptop" 
                         style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} 
                     />
@@ -78,7 +78,8 @@ export default function AboutPage() {
             <div className="comic-row" style={{ display: 'flex', gap: '20px', marginBottom: '20px', alignItems: 'stretch' }}>
                 <section className="content panel panel-third" style={{ flex: '1', margin: 0 }}>
                     <img 
-                        src={myJourneyImg} 
+                        /* ✅ FIX: Reference directly from public folder */
+                        src="/MyJourney.jpg" 
                         alt="Gaming workspace" 
                         style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px' }} 
                     />
@@ -101,36 +102,29 @@ export default function AboutPage() {
                 </section>
             </div>
 
-            {/* QUOTE SECTION (Centralized) */}
+            {/* QUOTE SECTION */}
             <div className="panel-full" style={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center', 
                 margin: '80px 0',
-                perspective: '1000px' /* Adds a tiny bit of depth for the slide */
+                perspective: '1000px'
             }}>
                 <blockquote className="panel" style={{ 
                     margin: 0, 
                     textAlign: 'center', 
                     fontSize: '1.2rem',
                     color: '#000',
-                    fontWeight: '700', /* Making the text bold to match the comic feel */
-                    
-                    /* THE SHAPE: Capsule/Oblong */
+                    fontWeight: '700',
                     maxWidth: '850px',
-                    width: 'fit-content', /* Wraps tight around the text */
-                    padding: '20px 60px', /* Tight top/bottom, wide sides */
-                    borderRadius: '100px', /* This creates the perfect "C" curve on the ends */
-                    
+                    width: 'fit-content',
+                    padding: '20px 60px',
+                    borderRadius: '100px',
                     backgroundColor: '#fff', 
                     border: '3px solid #000',
                     position: 'relative',
                     zIndex: 2,
-                    
-                    /* THE LAYERED SHADOW (Exact offset from your image) */
                     boxShadow: `8px 8px 0px 0px #000`,
-                    
-                    /* ANIMATION */
                     animation: 'slideIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards'
                 }}>
                     <span style={{ fontSize: '2rem', marginRight: '5px' }}>"</span>

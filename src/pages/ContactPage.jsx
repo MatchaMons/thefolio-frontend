@@ -1,5 +1,7 @@
 import React from 'react';
 
+// ✅ REMOVED: import locationImg from '../assets/Location.jpg';
+
 export default function ContactPage() {
     return (
         /* The inline style here is the 'key' that unlocks your .panel-third classes */
@@ -31,7 +33,8 @@ export default function ContactPage() {
             <section className="content panel panel-third panel-tall">
                 <h2>Location</h2>
                 <img 
-                    src={locationImg} 
+                    /* ✅ FIX: Path points directly to the file in the public folder */
+                    src="/Location.jpg" 
                     alt="Map" 
                     style={{ width: '100%', height: 'auto', border: '3px solid black' }} 
                 />
