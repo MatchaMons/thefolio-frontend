@@ -1,5 +1,4 @@
 import React from 'react';
-import locationImg from '../assets/Location.jpg';
 
 export default function ContactPage() {
     return (

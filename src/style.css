@@ -1291,7 +1291,7 @@ textarea::placeholder {
   min-height: 100vh;
   /* REPLACE 'your-image-path.jpg' with the actual filename you used for the homepage */
   background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-              url('./assets/ComicBackground.jpg'); 
+             url('/ComicBackground.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

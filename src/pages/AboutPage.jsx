@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Import the specific assets for this page
-import loveGamingImg from '../assets/LoveGaming.jpg';
-import myJourneyImg from '../assets/MyJourney.jpg';
-
 export default function AboutPage() {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
