@@ -83,7 +83,7 @@ export default function HomePage() {
                         <p>Gaming is more than just entertainment — it builds strategy, teamwork, problem-solving, and creativity. 
                           This portfolio showcases my passion for gaming, the skills I've developed, and the experiences that shaped my interest in the gaming world.</p>
                     </div>
-                    <img src={setUpImg} alt="Gaming setup" />
+                    <img src="/SetUP.jpg" alt="Gaming setup" />
                 </section>
 
                 <section className="content panel panel-third" style={{ flex: '1', margin: 0, position: 'relative' }}>
