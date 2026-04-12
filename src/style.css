@@ -209,7 +209,7 @@ body.dark-mode::after {
     /* Swaps the gradient stars for your dark mode image */
     background-image: 
         linear-gradient(rgba(10, 14, 39, 0.7), rgba(10, 14, 39, 0.7)), 
-        url("./darkmode.jpg"); 
+        url("/darkmode.jpg"); 
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
