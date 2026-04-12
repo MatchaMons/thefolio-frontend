@@ -187,7 +187,7 @@ body::before {
     height: 100%;
     background-image: 
         radial-gradient(rgba(0,0,0,0.2) 15%, transparent 16%), 
-        url("/ComicBackground.jpg");
+        url("../public/ComicBackground.jpg");
     background-size: 15px 15px, cover;
     background-attachment: fixed;
     background-position: center;
@@ -1291,7 +1291,7 @@ textarea::placeholder {
   min-height: 100vh;
   /* REPLACE 'your-image-path.jpg' with the actual filename you used for the homepage */
   background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-             url('/ComicBackground.jpg');
+             url('../public/ComicBackground.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
