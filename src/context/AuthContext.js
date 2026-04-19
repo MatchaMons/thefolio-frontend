@@ -9,19 +9,27 @@ export const AuthProvider = ({ children }) => {
 
     // 1. Check for existing token on load
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const savedUser = localStorage.getItem('user');
-        
-        if (token && savedUser) {
+    const token = localStorage.getItem('token');
+    
+    const verifyUser = async () => {
+        if (token) {
             try {
-                setUser(JSON.parse(savedUser));
+                // Call an endpoint like /auth/me that returns the full user object
+                const res = await API.get('/auth/me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUser(res.data);
+                localStorage.setItem('user', JSON.stringify(res.data));
             } catch (e) {
-                console.error("Failed to parse user from storage");
-                localStorage.removeItem('user');
+                console.error("Token invalid or expired");
+                logout(); // Clears everything if the token is bad
             }
         }
         setLoading(false);
-    }, []);
+    };
+
+    verifyUser();
+}, []);
 
     // 2. Login Logic
     const login = async (email, password) => {
