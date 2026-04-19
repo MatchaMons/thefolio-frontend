@@ -25,11 +25,14 @@ import ProfilePage from "./pages/ProfilePage";
 import CreatePostPage from "./pages/CreatePostPage";
 import EditPostPage from "./pages/EditPostPage";
 import AdminPage from "./pages/AdminPage";
-import AnalyticsPage from "./pages/AnalyticsPage"; // Added import
+import AnalyticsPage from "./pages/AnalyticsPage";
 
 function App() {
   const location = useLocation();
   const { user, loading } = useAuth();
+
+  // Debugging log (Now inside the component)
+  console.log("Current User Role:", user?.role);
   
   const isSplashPage = location.pathname === "/" || location.pathname.startsWith("/boss");
 
@@ -80,57 +83,19 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected Routes */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/create-post"
-            element={
-              <ProtectedRoute>
-                <CreatePostPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/edit-post/:id"
-            element={
-              <ProtectedRoute>
-                <EditPostPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/create-post" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
+          <Route path="/edit-post/:id" element={<ProtectedRoute><EditPostPage /></ProtectedRoute>} />
 
           {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute role="admin">
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/analytics"
-            element={
-              <ProtectedRoute role="admin">
-                <AnalyticsPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPage /></ProtectedRoute>} />
+          <Route path="/admin/analytics" element={<ProtectedRoute role="admin"><AnalyticsPage /></ProtectedRoute>} />
         </Routes>
       </main>
 
       {!isSplashPage && <Footer />}
     </div>
-    
   );
 }
-console.log("Current User Role:", user?.role);
+
 export default App;
