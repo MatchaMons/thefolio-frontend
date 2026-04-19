@@ -116,16 +116,21 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route 
-            path="/admin/analytics" 
-            element={user?.role === 'admin' ? <AnalyticsPage /> : <Navigate to="/login" />} 
+          <Route
+            path="/admin/analytics"
+            element={
+              <ProtectedRoute role="admin">
+                <AnalyticsPage />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </main>
 
       {!isSplashPage && <Footer />}
     </div>
+    
   );
 }
-
+console.log("Current User Role:", user?.role);
 export default App;
