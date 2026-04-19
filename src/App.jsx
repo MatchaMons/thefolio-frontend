@@ -17,7 +17,7 @@ import BossCodePage from "./pages/BossCodePage";
 import BossHackerPage from "./pages/BossHackerPage";
 
 // System pages
-import FeedPage from "./pages/FeedPage"; // Added FeedPage
+import FeedPage from "./pages/FeedPage";
 import PostPage from "./pages/PostPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -25,12 +25,12 @@ import ProfilePage from "./pages/ProfilePage";
 import CreatePostPage from "./pages/CreatePostPage";
 import EditPostPage from "./pages/EditPostPage";
 import AdminPage from "./pages/AdminPage";
+import AnalyticsPage from "./pages/AnalyticsPage"; // Added import
 
 function App() {
   const location = useLocation();
   const { user, loading } = useAuth();
   
-  // Hide Navbar and Footer on Splash and all Boss battle pages
   const isSplashPage = location.pathname === "/" || location.pathname.startsWith("/boss");
 
   if (loading) {
@@ -107,7 +107,7 @@ function App() {
             }
           />
 
-          {/* Admin */}
+          {/* Admin Routes */}
           <Route
             path="/admin"
             element={
@@ -115,6 +115,10 @@ function App() {
                 <AdminPage />
               </ProtectedRoute>
             }
+          />
+          <Route 
+            path="/admin/analytics" 
+            element={user?.role === 'admin' ? <AnalyticsPage /> : <Navigate to="/login" />} 
           />
         </Routes>
       </main>
